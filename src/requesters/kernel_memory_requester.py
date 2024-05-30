@@ -26,9 +26,6 @@ class KernelMemoryRequester:
         ).json()
 
         if "text" in response:
-            return {
-                "text": response.get("text"),
-                "sources": response.get("relevantSources"),
-            }
+            return response
         else:
             return "Infelizmente, eu não consegui responder essa pergunta se baseando no meu banco de conhecimento atual. Tente reescrever a sua pergunta de outro modo, talvez eu entende melhor :)"

@@ -75,11 +75,11 @@ class ChatWidget:
                         kwargs={"prompt": extra},
                     )
 
-                # st.chat_message("human").button(
-                #     "Fazer outra pergunta ...",
-                #     on_click=set_prompt,
-                #     kwargs={"prompt": ""},
-                # )
+                st.chat_message("human").button(
+                    "Fazer outra pergunta ...",
+                    on_click=set_prompt,
+                    kwargs={"prompt": ""},
+                )
             else:
                 st.chat_message("ai").write(answer)
         else:

@@ -5,14 +5,15 @@ import os
 
 class KernelMemoryRequester:
     @staticmethod
-    def answer(question):
+    def answer(question, topic):
         public_host = os.getenv("CONCURSOSGPT_PUBLIC_HOST")
         port = os.getenv("CONCURSOSGPT_PUBLIC_HOST_PORT")
         api_key = os.getenv("CONCURSOSGPT_HOST_API_KEY")
 
         data = {
-            "index": "concurso-publico-gpt",
+            "index": "cnu",
             "question": question,
+            "filters": [{"topic": [topic]}],
             "minRelevance": 0,
         }
 

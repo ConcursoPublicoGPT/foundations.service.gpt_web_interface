@@ -4,4 +4,4 @@ import streamlit as st
 class HeaderWidget:
     @staticmethod
     def display():
-        st.title("Concurso Público GPT")
+        st.title(":orange[ChatGPT CNU]")

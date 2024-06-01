@@ -41,7 +41,7 @@ class ChatWidget:
                 prompt = st.chat_input(
                     "Faça a sua pergunta aqui ...", on_submit=set_reset_prompt
                 )
-                st.session_state["prompt"] = prompt
+                st.session_state["prompt"] = ""
 
     @staticmethod
     def answer_question(prompt, topic):
@@ -77,7 +77,7 @@ class ChatWidget:
                 st.chat_message("human").button(
                     "Fazer outra pergunta ...",
                     on_click=set_prompt,
-                    kwargs={"prompt": None},
+                    kwargs={"prompt": ""},
                 )
             else:
                 st.chat_message("ai").write(answer)

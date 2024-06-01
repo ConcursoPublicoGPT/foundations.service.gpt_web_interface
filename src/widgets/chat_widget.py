@@ -37,21 +37,13 @@ class ChatWidget:
 
         if prompt is not None:
             ChatWidget.answer_question(prompt, topic)
-            if st.session_state.get("prompt") != "" and "promp" in st.session_state:
-                prompt = st.chat_input(
-                    "Faça a sua pergunta aqui ...",
-                    on_submit=set_prompt,
-                    kwargs={"prompt": ""},
-                )
 
     @staticmethod
     def answer_question(prompt, topic):
         api_prompt = f"""
         Você deve atuar como um professor respondendo a pergunta de um aluno de forma clara e detalhada.
         Responda sempre em português brasileiro.
-        Responda no formato de JSON.
-        A key "result" deve retornar a resposta para a pergunta.
-        A key "extras" deve retornar uma lista com 2 novas perguntas e diferentes que irão estimular a pessoa aprender mais sobre conceitos relacionados à pergunta feita e estão relacionados ao seu contexto:
+        Além da resposta para a pergunta, você deve retornar uma lista com 3 novas perguntas e diferentes que irão estimular a pessoa aprender mais sobre conceitos relacionados à pergunta feita e que estejam relacionadas ao seu contexto:
 
         {prompt}
         """
@@ -62,26 +54,10 @@ class ChatWidget:
 
         st.chat_message("human").write(prompt)
 
-        answer = json.loads(raw_answer.get("text"))
+        answer = raw_answer.get("text")
 
         if not (raw_answer.get("noResult")):
-            if answer.get("result"):
-                st.chat_message("ai").write(answer.get("result"))
-
-                for extra in answer.get("extras"):
-                    st.chat_message("human").button(
-                        extra,
-                        on_click=set_prompt,
-                        kwargs={"prompt": extra},
-                    )
-
-                st.chat_message("human").button(
-                    "Fazer outra pergunta ...",
-                    on_click=set_prompt,
-                    kwargs={"prompt": ""},
-                )
-            else:
-                st.chat_message("ai").write(answer)
+            st.chat_message("ai").write(answer)
         else:
             st.chat_message("ai").write(
                 "Infelizmente, eu não consegui encontrar uma resposta a partir do meu banco de conhecimentos. Será que poderia escrever a sua pergunta de outra forma, por favor? :)"

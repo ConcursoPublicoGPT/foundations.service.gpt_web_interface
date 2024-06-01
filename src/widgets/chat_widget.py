@@ -26,6 +26,7 @@ class ChatWidget:
         elif (
             st.session_state.get("reset_prompt")
             and st.session_state.get("prompt") != ""
+            and "promp" in st.session_state
         ):
             st.session_state["reset_prompt"] = False
             prompt = st.chat_input("Faça a sua pergunta aqui ...")
@@ -36,7 +37,7 @@ class ChatWidget:
 
         if prompt is not None:
             ChatWidget.answer_question(prompt, topic)
-            if st.session_state.get("prompt") != "":
+            if st.session_state.get("prompt") != "" and "promp" in st.session_state:
                 prompt = st.chat_input(
                     "Faça a sua pergunta aqui ...", on_submit=set_reset_prompt
                 )

@@ -73,6 +73,12 @@ class ChatWidget:
                         on_click=set_prompt,
                         kwargs={"prompt": extra},
                     )
+
+                st.chat_message("human").button(
+                    "Fazer outra pergunta ...",
+                    on_click=set_prompt,
+                    kwargs={"prompt": None},
+                )
             else:
                 st.chat_message("ai").write(answer)
         else:

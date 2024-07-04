@@ -17,7 +17,7 @@ class ChatWidget:
         st.write("")
 
         st.chat_message("ai").write(
-            f"Olá, tudo bem? 👋 \n\n Quais as dúvidas que eu posso te ajudar?",
+            f"Olá, tudo bem? 👋 \n\n Qual a sua dúvida hoje?",
         )
 
         if "prompt" not in st.session_state or st.session_state.get("prompt") == "":

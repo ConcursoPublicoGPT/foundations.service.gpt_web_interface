@@ -14,7 +14,7 @@ st.sidebar.title(
     "RAG Validation \n Esta aplicação web é direcionada à validação das múltiplas infraestruturas."
 )
 
-pages = ["Parallels", "BigBang", "Documentos"]
+pages = ["BigBang", "Parallels", "Documentos"]
 
 selected_page = st.sidebar.selectbox("Selecione uma das páginas", pages)
 

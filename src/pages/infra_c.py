@@ -7,7 +7,7 @@ class PageInfraC:
     def display():
         st.title(":violet[Arquitetura | Parallels] 🔀")
         st.write(
-            "Esta arquitetura é a primeira arquitetura desenvolvida. Composta por **GPT-4o, rerank, busca vetorial baseada em cosines e com uma estrutura de pré-filtragem baseada em parallel quotes**.\n\nFaça os seus experimentos."
+            "Esta arquitetura é a segunda arquitetura desenvolvida. Composta por **GPT-4o mini, rerank, busca vetorial baseada em cosines e com uma estrutura de pré-filtragem baseada em parallel quotes**.\n\nFaça os seus experimentos."
         )
         st.write("**• Tópico:**")
         topic = st.selectbox(label="Selecione o tópico.", options=["act"])

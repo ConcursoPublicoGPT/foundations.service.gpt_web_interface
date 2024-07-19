@@ -1,64 +1,102 @@
 import streamlit as st
-from src.requesters.kernel_memory_requester import KernelMemoryRequester
+import requests
 import json
-
-
-def set_prompt(prompt):
-    st.session_state["prompt"] = prompt
-
-
-def set_reset_prompt():
-    st.session_state["reset_prompt"] = True
+from src.agents.agent_reasoner import AgentReasoner
+import os
 
 
 class ChatWidget:
     @staticmethod
-    def display():
-        st.write("")
+    def display(topic, model="a"):
 
-        st.chat_message("ai").write(
-            f"Olá, tudo bem? 👋 \n\n Qual a sua dúvida hoje?",
-        )
+        host = os.getenv("MAIN_HOST")
 
-        if "prompt" not in st.session_state or st.session_state.get("prompt") == "":
-            prompt = st.chat_input("Faça a sua pergunta aqui ...")
-        elif (
-            st.session_state.get("reset_prompt")
-            and st.session_state.get("prompt") != ""
-            and "promp" in st.session_state
-        ):
-            st.session_state["reset_prompt"] = False
-            prompt = st.chat_input("Faça a sua pergunta aqui ...")
-            prompt = st.session_state.get("prompt")
-            st.session_state["prompt"] = ""
-        else:
-            prompt = st.session_state.get("prompt")
+        if "messages" not in st.session_state:
+            st.session_state.messages = []
 
-        if prompt is not None:
-            ChatWidget.answer_question(prompt)
+        for message in st.session_state.messages:
+            with st.chat_message(message["role"]):
+                st.markdown(message["content"])
 
-    @staticmethod
-    def answer_question(prompt):
-        api_prompt = f"""
-        Responda sempre em português brasileiro, com qualidade e acurácia.
+        if prompt := st.chat_input("Faça a sua pergunta aqui ..."):
 
-        {prompt}
-        """
+            st.session_state.messages.append({"role": "user", "content": prompt})
 
-        raw_answer = KernelMemoryRequester.answer(api_prompt)
+            with st.chat_message("user"):
 
-        st.chat_message("human").write(prompt)
+                st.markdown(prompt)
 
-        answer = raw_answer.get("text")
+            with st.chat_message("assistant"):
 
-        if not (raw_answer.get("noResult")):
-            st.chat_message("ai").write(answer)
+                model_name = {"a": "BigBang 🪐", "c": "Parallels 🔀"}
+
+                model_content = (
+                    f"Nesta resposta, eu usarei o modelo **{model_name.get(model)}:**"
+                )
+                st.session_state.messages.append(
+                    {
+                        "role": "assistant",
+                        "content": model_content,
+                    }
+                )
+
+                st.markdown(model_content)
+
+                response = requests.get(
+                    url=f"{host}/v1_0_0/ask/infra_{model}",
+                    params={
+                        "query": prompt,
+                        "topic": topic,
+                    },
+                )
+
+                if response.status_code == 200:
+
+                    data = json.loads(response.content).get("body")
+
+                    context = data.get("context")
+
+                    references = ""
+                    for reference in data.get("references"):
+                        references = references + f"- {reference}\n"
+
+                    if model == "a":
+                        stream = AgentReasoner.from_full_context(
+                            query=prompt,
+                            document=context,
+                        )
+                    elif model == "b":
+                        stream = AgentReasoner.from_full_context(
+                            query=prompt,
+                            document=context,
+                            model="gpt-3.5-turbo",
+                        )
+                    elif model == "c":
+                        stream = AgentReasoner.from_quotes(
+                            query=prompt,
+                            document=context,
+                        )
+                    elif model == "d":
+                        stream = AgentReasoner.from_quotes(
+                            query=prompt,
+                            document=context,
+                            model="gpt-3.5-turbo",
+                        )
+                    else:
+                        raise Exception("Você deve definir o valor de 'model'.")
+
+                    response = st.write_stream(stream)
+
+                else:
+
+                    response = (
+                        f"Tivemos uma falha de infraestrutura.\n\n{response.text}"
+                    )
+
+            st.session_state.messages.append({"role": "assistant", "content": response})
+
             st.download_button(
-                "Faça o download das fontes",
-                data=json.dumps(raw_answer),
-                file_name="sources.json",
-            )
-        else:
-            st.chat_message("ai").write(
-                "Infelizmente, eu não consegui encontrar uma resposta a partir do meu banco de conhecimentos. Será que poderia escrever a sua pergunta de outra forma, por favor? :)"
+                label="Download das fontes utilizadas pelo modelo.",
+                data=context,
+                file_name="model_sources.txt",
             )
